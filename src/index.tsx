@@ -3,15 +3,23 @@ import { nanoid } from 'nanoid'
 import { renderer } from './renderer'
 import { HomePage } from './components/HomePage'
 import { StatsPage } from './components/StatsPage'
+import { DashboardPage } from './components/DashboardPage'
 
 type Bindings = {
   URLS: KVNamespace
   ANALYTICS: KVNamespace
 }
 
-type UrlData = {
+export type UrlData = {
   url: string
   createdAt: string
+}
+
+export type UrlEntry = {
+  code: string
+  url: string
+  createdAt: string
+  clicks: number
 }
 
 export type ClickData = {
@@ -63,6 +71,12 @@ app.post('/shorten', async (c) => {
   // Initialize empty analytics
   await c.env.ANALYTICS.put(`${code}:clicks`, JSON.stringify([]))
 
+  // Add to index for dashboard
+  const indexData = await c.env.URLS.get('__index')
+  const index: string[] = indexData ? JSON.parse(indexData) : []
+  index.unshift(code) // Add to front (newest first)
+  await c.env.URLS.put('__index', JSON.stringify(index))
+
   const shortUrl = new URL(`/${code}`, c.req.url).toString()
   const statsUrl = new URL(`/stats/${code}`, c.req.url).toString()
 
@@ -74,12 +88,35 @@ app.post('/shorten', async (c) => {
   })
 })
 
+// Dashboard - list all URLs
+app.get('/dashboard', async (c) => {
+  const indexData = await c.env.URLS.get('__index')
+  const codes: string[] = indexData ? JSON.parse(indexData) : []
+  
+  // Fetch all URL data and click counts
+  const entries: UrlEntry[] = await Promise.all(
+    codes.slice(0, 100).map(async (code) => {
+      const urlData = await c.env.URLS.get(code)
+      const clicksData = await c.env.ANALYTICS.get(`${code}:clicks`)
+      
+      if (!urlData) return null
+      
+      const { url, createdAt } = JSON.parse(urlData) as UrlData
+      const clicks = clicksData ? JSON.parse(clicksData).length : 0
+      
+      return { code, url, createdAt, clicks }
+    })
+  ).then(results => results.filter((e): e is UrlEntry => e !== null))
+
+  return c.render(<DashboardPage entries={entries} />)
+})
+
 // Redirect + log analytics
 app.get('/:code', async (c) => {
   const code = c.req.param('code')
   
   // Skip if it's a known route
-  if (code === 'stats' || code === 'shorten') {
+  if (code === 'stats' || code === 'shorten' || code === 'dashboard') {
     return c.notFound()
   }
 

@@ -530,4 +530,145 @@ footer {
     width: 80px;
     font-size: 0.8rem;
   }
+
+  .urls-header,
+  .urls-row {
+    grid-template-columns: 80px 1fr 60px !important;
+  }
+
+  .urls-row .created-time,
+  .urls-row .actions,
+  .urls-header span:nth-child(4),
+  .urls-header span:nth-child(5) {
+    display: none;
+  }
+}
+
+/* Dashboard */
+.dashboard-container {
+  max-width: 900px;
+}
+
+.dashboard-container header {
+  text-align: left;
+}
+
+.urls-list {
+  margin-top: 40px;
+}
+
+.urls-list h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.urls-table {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.urls-header {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 100px 80px;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--bg-tertiary);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.urls-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 100px 80px;
+  gap: 16px;
+  padding: 14px 20px;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border);
+  align-items: center;
+}
+
+.urls-row:hover {
+  background: rgba(249, 115, 22, 0.03);
+}
+
+.short-code a {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+.short-code a:hover {
+  text-decoration: underline;
+}
+
+.original-url {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clicks-count {
+  text-align: center;
+}
+
+.clicks-badge {
+  display: inline-block;
+  background: var(--bg-tertiary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.created-time {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.actions {
+  text-align: right;
+}
+
+.stats-btn {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.stats-btn:hover {
+  text-decoration: underline;
+}
+
+.no-data a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.no-data a:hover {
+  text-decoration: underline;
+}
+
+/* Dashboard link on homepage */
+.dashboard-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.dashboard-link:hover {
+  color: var(--accent-secondary);
+  text-decoration: underline;
 }

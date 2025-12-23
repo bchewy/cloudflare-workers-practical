@@ -48,8 +48,8 @@ export function HomePage() {
       </main>
 
       <footer>
-        <p>Powered by Cloudflare Workers + KV</p>
-        <p class="geo-info">Your request was served from the edge ⚡</p>
+        <p><a href="/dashboard" class="dashboard-link">📋 View Dashboard</a></p>
+        <p class="geo-info">Powered by Cloudflare Workers + KV ⚡</p>
       </footer>
 
       <script dangerouslySetInnerHTML={{ __html: `
