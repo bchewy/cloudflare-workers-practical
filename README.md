@@ -96,22 +96,51 @@ npm run deploy
 | `/:code` | GET | Redirect to original URL + log analytics |
 | `/stats/:code` | GET | View click analytics |
 
-### Edge Geolocation
+### Edge Geolocation — The Missing Magic ✨
 
-Cloudflare automatically provides geolocation data on every request via `request.cf`:
+This is the **"wow" factor** of Cloudflare Workers that most tutorials skip over.
+
+Every request that hits a Cloudflare Worker automatically includes geolocation data via `request.cf`. This data is populated **at the edge** — meaning Cloudflare's network determines the user's location before your code even runs.
 
 ```typescript
-const cf = request.cf
-// cf.country  → "US"
-// cf.city     → "San Francisco"
-// cf.region   → "California"
-// cf.timezone → "America/Los_Angeles"
-// cf.latitude → "37.7749"
-// cf.longitude→ "-122.4194"
-// cf.asOrganization → "Cloudflare Inc"
+// In Hono, access it via c.req.raw.cf
+const cf = c.req.raw.cf
+
+// What you get (for free!):
+cf.country        // "US" — ISO country code
+cf.city           // "San Francisco"
+cf.region         // "California"
+cf.regionCode     // "CA"
+cf.timezone       // "America/Los_Angeles"
+cf.latitude       // "37.7749"
+cf.longitude      // "-122.4194"
+cf.postalCode     // "94102"
+cf.asn            // 13335 — Autonomous System Number
+cf.asOrganization // "Cloudflare Inc" — ISP name
 ```
 
-**No API keys needed** — it's free and instant at every edge location.
+**Why this is powerful:**
+- **No API keys** — It's free, no third-party geolocation service needed
+- **Zero latency** — Data is available instantly, no external API call
+- **Privacy-friendly** — IP-based, no cookies or tracking required
+- **Always accurate** — Cloudflare's network handles 20%+ of internet traffic
+
+**How we use it in this project:**
+
+```typescript
+// src/index.tsx — logging click analytics
+const cf = c.req.raw.cf as { country?: string; city?: string; /* ... */ }
+
+const clickData = {
+  timestamp: new Date().toISOString(),
+  country: cf?.country ?? null,
+  city: cf?.city ?? null,
+  asOrganization: cf?.asOrganization ?? null,
+  // ...
+}
+```
+
+> ⚠️ **Important:** When running locally (`npm run dev`), the `cf` object is often `undefined` or empty. You will only see real location data once you **deploy to Cloudflare**. This is because the geolocation is injected by Cloudflare's edge network, not simulated locally.
 
 ---
 
@@ -181,7 +210,10 @@ The local dev server simulates Cloudflare Workers with full KV support:
 npm run dev
 ```
 
-Note: Geolocation data (`request.cf`) will be simulated/empty locally. Deploy to see real geo data.
+> ⚠️ **Local vs Production Differences:**
+> - **KV Storage** — Works locally (Wrangler simulates it)
+> - **Geolocation (`request.cf`)** — Empty/undefined locally. Deploy to see real data.
+> - **Performance** — Local is single-threaded; production runs on 300+ edge locations globally
 
 ---
 
