@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cloudflare-workers-practical",
+  "compatibility_date": "2025-08-03",
+  "main": "./src/index.tsx",
+  "kv_namespaces": [
+    { "binding": "URLS", "id": "9bb877385b994424b71957f5a84ecfcf" },
+    { "binding": "ANALYTICS", "id": "2988884b799d4438a53eea4eafc771ac" }
+  ]
+}
